@@ -121,12 +121,12 @@ class Puzzle
 			for val in 0..(@dimension - 1 )
 				for j in 0..(@dimension - 1 )
 					if rowArray[i][val].nil?
-						if @grid[i][j].possiblesCheck?( val + 1 )
+						if @grid[i][j].possibleValue?( val + 1 )
 							tempArray = [j]
 							rowArray[i][val] = tempArray
 						end
 					else
-						if @grid[i][j].possiblesCheck?( val + 1 )
+						if @grid[i][j].possibleValue?( val + 1 )
 							tempArray = [j]
 							rowArray[i][val] = rowArray[i][val] + tempArray
 						end
@@ -153,12 +153,12 @@ class Puzzle
 			for val in 0..(@dimension - 1 )
 				for i in 0..(@dimension - 1 )
 					if colArray[j][val].nil?
-						if @grid[i][j].possiblesCheck?( val + 1 )
+						if @grid[i][j].possibleValue?( val + 1 )
 							tempArray = [i]
 							colArray[j][val] = tempArray
 						end
 					else
-						if @grid[i][j].possiblesCheck?( val + 1 )
+						if @grid[i][j].possibleValue?( val + 1 )
 							tempArray = [i]
 							colArray[j][val] = colArray[j][val] + tempArray
 						end
@@ -188,12 +188,12 @@ class Puzzle
 					for j in (anchorArray[k][1])..(anchorArray[k][1]+2)
 					
 						if coordinateArray[k][val].nil?
-							if @grid[i][j].possiblesCheck?( val + 1 )
+							if @grid[i][j].possibleValue?( val + 1 )
 								tempArray = [ i , j ]
 								coordinateArray[k][val] = tempArray
 							end
 						else
-							if @grid[i][j].possiblesCheck?( val + 1 )
+							if @grid[i][j].possibleValue?( val + 1 )
 								tempArray = [ i , j ]
 								coordinateArray[k][val] = coordinateArray[k][val] + tempArray
 							end

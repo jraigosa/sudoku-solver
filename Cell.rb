@@ -50,19 +50,11 @@ class Cell
 		end
 	end
 	
-	def possiblesCheck?(val)
+	def possibleValue?(val)
 		if !@possibles.nil?
-			if @possibles.include?(val)
-				return true
-			else
-				return false
-			end
+			return @possibles.include?(val)
 		else
-			if val = @val  #this is hacky.. need to think about it
-				return true
-			else
-				return false
-			end
+			return val == @val #this is hacky.. need to think about it
 		end
 	end
 	
