@@ -11,6 +11,10 @@ class Cell
 	def to_i
 		return @val
 	end
+
+	def to_s
+		return @val == 0 ? "·" : @val.to_s
+	end
 	
 	def solved?
 		if @val.zero?

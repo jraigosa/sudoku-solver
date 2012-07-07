@@ -41,18 +41,26 @@ class Puzzle
 		@grid[row][col] = cell
 	end
 	
-	
-	def display()
-		x, y  = 1, 2
-		for i in 0..(@dimension-1)
-			tempArray = Array.new( @dimension )
-			for j in 0..(@dimension-1)
-				 tempArray[j] = @grid[i][j].to_i
+	def to_s
+		output = String.new();
+		for i in 0..( @dimension - 1 )
+
+			if i > 0 && i % 3 == 0
+				output += ( "-" * ( ( @dimension + 4 ) * 2 ) ) + "\n"
 			end
-			puts tempArray.join(' ')
+
+			for j in 0..( @dimension - 1 )
+			 	if j > 0 && j % 3 == 0
+					output += " |  "
+				end
+				output += @grid[i][j].to_s + " "
+			end
+
+			output += "\n"
 		end
+		return output
 	end
-	
+
 	def solve!()
 		for i in 0..(@dimension - 1)
 			for j in 0..(@dimension - 1)

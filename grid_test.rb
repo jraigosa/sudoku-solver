@@ -27,9 +27,9 @@ while ! continue.zero?
 	end
 =end
 	
-	puts "Enter filename"
+	STDOUT.puts "Enter filename"
 	STDOUT.flush
-	file = gets.chomp
+	file = STDIN.gets.chomp
 	
 	f = File.open( file )
 	lines = f.readlines
@@ -44,23 +44,21 @@ while ! continue.zero?
 		end
 	end
 	
-	puts "1 to display puzzle, 0 to continue"
+	STDOUT.puts "1 to display puzzle, 0 to continue"
 	STDOUT.flush
-	yes = gets.chomp.to_i
+	yes = STDIN.gets.chomp.to_i
 	if ! yes.zero?
-		puts
-		sudoku.display()
-		puts
+		STDOUT.puts "\n#{sudoku}\n"
 	end
 
 	solve = 1
 	while ! solve.zero?
 		if ! yes.zero?
 			sudoku.solve!()
-			sudoku.display()
+			STDOUT.puts "\n#{sudoku}\n"
 		end
 
-=begin rdoc
+=begin
 		possibles = 1
 		while ! possibles.zero?
 			puts "Enter row:"
@@ -76,12 +74,12 @@ while ! continue.zero?
 		end
 =end
 
-		puts "1 to continue solving, 0 to stop"
+		STDOUT.puts "1 to continue solving, 0 to stop"
 		STDOUT.flush
-		solve = gets.chomp.to_i
+		solve = STDIN.gets.chomp.to_i
 	end
 	
-	puts "0 to stop, 1 to continue"
+	STDOUT.puts "0 to stop, 1 to continue"
 	STDOUT.flush
-	continue = gets.chomp.to_i
+	continue = STDIN.gets.chomp.to_i
 end
