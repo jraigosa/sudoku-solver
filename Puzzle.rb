@@ -204,28 +204,27 @@ class Puzzle
 						row = coordinateArray[k][val][0]
 						col = coordinateArray[k][val][1]
 						if ! @grid[ row ][ col ].solved?
-							puts "BLOCK COMPLETE CHECK: BLOCK: #{ k + 1 }"
-							puts "ASSIGNED CELL. ROW: #{ row + 1 } COL: #{ col + 1 }"
-							puts "VALUE: #{ val + 1 }"
+							#puts "BLOCK COMPLETE CHECK: BLOCK: #{ k + 1 }"
+							#puts "ASSIGNED CELL. ROW: #{ row + 1 } COL: #{ col + 1 }"
+							#puts "VALUE: #{ val + 1 }"
 							@grid[row][col].solve!(val + 1 )
 						end
-=begin
 					elsif coordinateArray[k][val].size == 4
 						if coordinateArray[k][val][0] == coordinateArray[k][val][2]
-							puts "Cells collinear along a row.  VAL: #{ val + 1 }"
-							puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
-							puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
+							#puts "Cells collinear along a row.  VAL: #{ val + 1 }"
+							#puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
+							#puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
 							for y in 0..(@dimension-1)
 								if ( (y != coordinateArray[k][val][1] ) && ( y != coordinateArray[k][val][3] ) )
 									@grid[ coordinateArray[k][val][0] ][ y ].removeFromPossibles!( val + 1 )
 								end
 							end
 						elsif coordinateArray[k][val][1] == coordinateArray[k][val][3]
-							puts "Cells collinear along a column. VAL: #{ val + 1 }"
-							puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
-							puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
+							#puts "Cells collinear along a column. VAL: #{ val + 1 }"
+							#puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
+							#puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
 							for x in 0..(@dimension-1)
-								if ( (x != coordinateArray[k][val][0] ) && ( y != coordinateArray[k][val][2] ) )
+								if ( (x != coordinateArray[k][val][0] ) && ( x != coordinateArray[k][val][2] ) )
 									@grid[ x ][ coordinateArray[k][val][1] ].removeFromPossibles!( val + 1 )
 								end
 							end
@@ -233,17 +232,26 @@ class Puzzle
 
 					elsif coordinateArray[k][val].size == 6
 						if ( ( coordinateArray[k][val][0] == coordinateArray[k][val][2] ) && ( coordinateArray[k][val][0] == coordinateArray[k][val][4] ) )
-							puts "Cells collinear along a row. VAL: #{ val + 1 }"
-							puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
-							puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
-							puts "Cell 2:  ROW: #{ coordinateArray[k][val][4] + 1 } COL:  #{ coordinateArray[k][val][5] + 1 }"
-						elsif ( ( coordinateArray[k][val][1] == coordinateArray[k][val][3] ) && ( coordinateArray[k][val][0] == coordinateArray[k][val][5] ) )
-							puts "Cells collinear along a column. VAL: #{ val + 1 }"
-							puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
-							puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
-							puts "Cell 2:  ROW: #{ coordinateArray[k][val][4] + 1 } COL:  #{ coordinateArray[k][val][5] + 1 }"
+							#puts "Cells collinear along a row. VAL: #{ val + 1 }"
+							#puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
+							#puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
+							#puts "Cell 2:  ROW: #{ coordinateArray[k][val][4] + 1 } COL:  #{ coordinateArray[k][val][5] + 1 }"
+							for y in 0..(@dimension-1)
+								if ( (y != coordinateArray[k][val][1] ) && ( y != coordinateArray[k][val][3] ) && ( y != coordinateArray[k][val][5] ) )
+									@grid[ coordinateArray[k][val][0] ][ y ].removeFromPossibles!( val + 1 )
+								end
+							end
+						elsif ( ( coordinateArray[k][val][1] == coordinateArray[k][val][3] ) && ( coordinateArray[k][val][1] == coordinateArray[k][val][5] ) )
+							#puts "Cells collinear along a column. VAL: #{ val + 1 }"
+							#puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
+							#puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
+							#puts "Cell 2:  ROW: #{ coordinateArray[k][val][4] + 1 } COL:  #{ coordinateArray[k][val][5] + 1 }"
+							for x in 0..(@dimension-1)
+								if ( (x != coordinateArray[k][val][0] ) && ( x != coordinateArray[k][val][2] ) && ( x != coordinateArray[k][val][4] ) )
+									@grid[ x ][ coordinateArray[k][val][1] ].removeFromPossibles!( val + 1 )
+								end
+							end
 						end	
-=end
 					end
 				end	
 			end

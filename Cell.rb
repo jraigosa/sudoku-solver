@@ -41,9 +41,7 @@ class Cell
 				end
 				if @possibles
 					if @possibles.include?( val )
-						tempArray = [ val ]
-						@possibles = @possibles - tempArray
-						#puts "VALUE #{ val } removed from possibles"
+						@possibles = @possibles - [ val ]
 					end
 				end
 			end
