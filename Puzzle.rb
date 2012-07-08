@@ -122,13 +122,11 @@ class Puzzle
 				for j in 0..(@dimension - 1 )
 					if rowArray[i][val].nil?
 						if @grid[i][j].possibleValue?( val + 1 )
-							tempArray = [j]
-							rowArray[i][val] = tempArray
+							rowArray[i][val] = [j]
 						end
 					else
 						if @grid[i][j].possibleValue?( val + 1 )
-							tempArray = [j]
-							rowArray[i][val] = rowArray[i][val] + tempArray
+							rowArray[i][val] = rowArray[i][val] + [j]
 						end
 					end
 				end
@@ -154,13 +152,11 @@ class Puzzle
 				for i in 0..(@dimension - 1 )
 					if colArray[j][val].nil?
 						if @grid[i][j].possibleValue?( val + 1 )
-							tempArray = [i]
-							colArray[j][val] = tempArray
+							colArray[j][val] = [i]
 						end
 					else
 						if @grid[i][j].possibleValue?( val + 1 )
-							tempArray = [i]
-							colArray[j][val] = colArray[j][val] + tempArray
+							colArray[j][val] = colArray[j][val] + [i]
 						end
 					end
 				end
@@ -188,15 +184,17 @@ class Puzzle
 					for j in (anchorArray[k][1])..(anchorArray[k][1]+2)
 					
 						if coordinateArray[k][val].nil?
-							if @grid[i][j].possibleValue?( val + 1 )
-								tempArray = [ i , j ]
-								coordinateArray[k][val] = tempArray
-							end
+							#if ! @grid[i][j].solved?
+								if @grid[i][j].possibleValue?( val + 1 )
+									coordinateArray[k][val] = [ i , j ]
+								end
+							#end
 						else
-							if @grid[i][j].possibleValue?( val + 1 )
-								tempArray = [ i , j ]
-								coordinateArray[k][val] = coordinateArray[k][val] + tempArray
-							end
+							#if ! @grid[i][j].solved?
+								if @grid[i][j].possibleValue?( val + 1 )
+									coordinateArray[k][val] = coordinateArray[k][val] + [ i , j ]
+								end
+							#end
 						end	
 					#puts "ROW: #{ i+1 } COL: #{ j+1 }"
 					end
@@ -206,21 +204,33 @@ class Puzzle
 						row = coordinateArray[k][val][0]
 						col = coordinateArray[k][val][1]
 						if ! @grid[ row ][ col ].solved?
-							#puts "BLOCK COMPLETE CHECK: BLOCK: #{ k + 1 }"
-							#puts "ASSIGNED CELL. ROW: #{ coordinateArray[k][val][0] + 1 } COL: #{ col = coordinateArray[k][val][1] + 1 }"
-							#puts "VALUE: #{ val + 1 }"
+							puts "BLOCK COMPLETE CHECK: BLOCK: #{ k + 1 }"
+							puts "ASSIGNED CELL. ROW: #{ row + 1 } COL: #{ col + 1 }"
+							puts "VALUE: #{ val + 1 }"
 							@grid[row][col].solve!(val + 1 )
 						end
+=begin
 					elsif coordinateArray[k][val].size == 4
 						if coordinateArray[k][val][0] == coordinateArray[k][val][2]
 							puts "Cells collinear along a row.  VAL: #{ val + 1 }"
 							puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
 							puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
+							for y in 0..(@dimension-1)
+								if ( (y != coordinateArray[k][val][1] ) && ( y != coordinateArray[k][val][3] ) )
+									@grid[ coordinateArray[k][val][0] ][ y ].removeFromPossibles!( val + 1 )
+								end
+							end
 						elsif coordinateArray[k][val][1] == coordinateArray[k][val][3]
 							puts "Cells collinear along a column. VAL: #{ val + 1 }"
 							puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
 							puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
+							for x in 0..(@dimension-1)
+								if ( (x != coordinateArray[k][val][0] ) && ( y != coordinateArray[k][val][2] ) )
+									@grid[ x ][ coordinateArray[k][val][1] ].removeFromPossibles!( val + 1 )
+								end
+							end
 						end
+
 					elsif coordinateArray[k][val].size == 6
 						if ( ( coordinateArray[k][val][0] == coordinateArray[k][val][2] ) && ( coordinateArray[k][val][0] == coordinateArray[k][val][4] ) )
 							puts "Cells collinear along a row. VAL: #{ val + 1 }"
@@ -232,7 +242,8 @@ class Puzzle
 							puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
 							puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
 							puts "Cell 2:  ROW: #{ coordinateArray[k][val][4] + 1 } COL:  #{ coordinateArray[k][val][5] + 1 }"
-						end  
+						end	
+=end
 					end
 				end	
 			end

@@ -58,6 +58,12 @@ class Cell
 		end
 	end
 	
+	def removeFromPossibles!( val )
+		if !@possibles.nil? 
+			@possibles = @possibles - [val]
+		end
+	end
+	
 	def possibles
 		return @possibles
 	end	
