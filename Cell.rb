@@ -1,11 +1,10 @@
 class Cell
-	def initialize( val )
+	def initialize( val, max_value )
+		#todo: Check for invalid input values
 		@val = val
-		if @val.zero?
-			@possibles = 1, 2, 3, 4, 5, 6, 7, 8, 9
-		else
-			@possibles = nil
-		end
+		@possibles = @val.zero? ?
+			(1..max_value).to_a :
+			nil
 	end
 	
 	def to_i
@@ -13,15 +12,13 @@ class Cell
 	end
 
 	def to_s
-		return @val == 0 ? "·" : @val.to_s
+		return @val.zero? ?
+			"·" :
+			@val.to_s
 	end
 	
 	def solved?
-		if @val.zero?
-			return false
-		else
-			return true
-		end
+		return !@val.zero?
 	end
 	
 	def solve!( val )
@@ -31,19 +28,16 @@ class Cell
 		@possibles = nil
 	end
 	
-	def check!( val )
-		if ! val.zero?
-			if ! @possibles.nil?
-				if @possibles.size == 1 
-					#puts "SOLVED for #{ val }"
-					#puts @possibles
-					solve!( @possibles[0] )
-				end
-				if @possibles
-					if @possibles.include?( val )
-						@possibles = @possibles - [ val ]
-					end
-				end
+	def check!( solved_value )
+		if solved_value > 0 && !@possibles.nil?
+			#Delete the solved value from the list of possibles
+			@possibles.delete( solved_value )
+
+			#Solve the cell if there's only 1 possible value remaining
+			if @possibles.size == 1
+				#puts "SOLVED for #{ val }"
+				#puts @possibles
+				solve!( @possibles.first )
 			end
 		end
 	end
@@ -58,7 +52,7 @@ class Cell
 	
 	def removeFromPossibles!( val )
 		if !@possibles.nil? 
-			@possibles = @possibles - [val]
+			@possibles.delete( val )
 		end
 	end
 	

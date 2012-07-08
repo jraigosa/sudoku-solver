@@ -37,7 +37,7 @@ while ! continue.zero?
 	for i in 0..8
 		lineArray[i] = eval( lines[i] )
 	end
-	sudoku = Puzzle.new( 9 )
+	sudoku = Puzzle.new( :dimension => 9 )
 	for i in 0..8
 		for j in 0..8
 			sudoku.assignCell( i , j, lineArray[i][j] )
@@ -54,7 +54,7 @@ while ! continue.zero?
 	solve = 1
 	while ! solve.zero?
 		if ! yes.zero?
-			sudoku.solve!()
+			sudoku.solve_iteration!()
 			STDOUT.puts "\n#{sudoku}\n"
 		end
 

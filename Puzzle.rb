@@ -1,12 +1,28 @@
 require "Cell"
 
 class Puzzle
-	def initialize( dimension )
-		@grid = Array.new(dimension) { Array.new(dimension) }
-		@dimension = dimension
-		rowArray = Array.new(dimension) { Array.new(dimension) }
-		colArray = Array.new(dimension) { Array.new(dimension) }
-		blockArray = Array.new(dimension) { Array.new(dimension) }
+	def initialize( args )
+		if !args[:puzzle_grid].nil?
+			#If we wanted to be through, we would do more validation here
+			@dimension = args[:puzzle_grid].length
+			@grid = Array.new(@dimension) { Array.new(@dimension) }
+			args[:puzzle_grid].each_with_index { |row, i|
+				row.each_with_index { |col, j|
+					assignCell( i , j, row[j] )
+				}
+			}
+		else 
+			if !args[:dimension].nil?
+			@dimension = args[:dimension]
+			else
+				#Assume a dimension of 9 if neither a dimension nor grid is provided
+				@dimension = 9
+			end
+			@grid = Array.new(@dimension) { Array.new(@dimension) }
+		end
+		rowArray = Array.new(@dimension) { Array.new(@dimension) }
+		colArray = Array.new(@dimension) { Array.new(@dimension) }
+		blockArray = Array.new(@dimension) { Array.new(@dimension) }
 	end
 	
 	def readFile( filename )
@@ -30,66 +46,102 @@ class Puzzle
 				puts "Enter sudoku.grid element #{i+1}, #{j+1}"
 				STDOUT.flush
 				val = gets.chomp.to_i
-				cell = Cell.new( val )
+				cell = Cell.new( val, @dimension )
 				@grid[i][j] = cell
 			end
 		end		
 	end
 	
 	def assignCell( row, col, val )
-		cell = Cell.new( val )
-		@grid[row][col] = cell
+		@grid[row][col] = Cell.new( val, @dimension )
 	end
 	
 	def to_s
 		output = String.new();
-		for i in 0..( @dimension - 1 )
-
-			if i > 0 && i % 3 == 0
-				output += ( "-" * ( ( @dimension + 4 ) * 2 ) ) + "\n"
+		block_dimension = Math.sqrt( @dimension )
+		@dimension.times { |i| 
+			if i > 0 && i % block_dimension == 0
+				output += ( "-" * ( @dimension + 4 ) * ( block_dimension - 1 ) ) + "\n"
 			end
 
-			for j in 0..( @dimension - 1 )
-			 	if j > 0 && j % 3 == 0
+			@dimension.times { |j| 
+				if j > 0 && j % block_dimension == 0
 					output += " |  "
 				end
-				output += @grid[i][j].to_s + " "
-			end
+				output += "#{@grid[i][j]} "
+			}
 
 			output += "\n"
-		end
+		}
 		return output
 	end
 
-	def solve!()
-		for i in 0..(@dimension - 1)
-			for j in 0..(@dimension - 1)
+	def solved?
+		@dimension.times { |row|
+			if @grid[row].any? { |cell| !cell.solved? }
+				return false
+			end
+		}
+		return true
+	end
+
+	def solve!
+		while !solved?
+			solve_iteration!()
+		end
+	end
+
+	def solve_iteration!()
+		@dimension.times { |i| 
+			@dimension.times { |j| 
 				if ! @grid[i][j].solved?
 					checkRow!(i,j)
 					checkCol!(i,j)
 					checkBlock!(i,j)
 				end
-			end
-		end
+			}
+		}
 		checkBlockComplete()
 		checkRowComplete()
 		checkColComplete()
 	end
 	
 	def checkRow!( row, col )
-		for j in 0..(@dimension-1)
-			if j != col
-				@grid[row][col].check!( @grid[row][j].to_i )
-			end
+		cell_to_check = @grid[row][col]
+		
+		#Nothing to do if this cell is already solved
+		if cell_to_check.solved?
+			return
 		end
+
+		@grid[row].find_all{ |cell|
+			cell.solved?
+		}.each{ |cell| 
+			cell_to_check.check!( cell.to_i )
+
+			if cell_to_check.solved?
+				return
+			end
+		}
 	end
 	
 	def checkCol!( row, col )
-		for i in 0..(@dimension-1)
-			if i != row
-				@grid[row][col].check!( @grid[i][col].to_i )
-			end
+		cell_to_check = @grid[row][col]
+
+		#Nothing to do if this cell is already solved
+		if cell_to_check.solved?
+			return
 		end
+
+		@dimension.times { |i| 
+			if i != row
+				cell_to_check.check!( @grid[i][col].to_i )
+			end
+
+			if cell_to_check.solved?
+				return
+			end
+		}
 	end
 	
 	def checkBlock!(row, col)
