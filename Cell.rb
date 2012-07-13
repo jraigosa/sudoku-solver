@@ -53,6 +53,7 @@ class Cell
 	def removeFromPossibles!( val )
 		if !@possibles.nil? 
 			@possibles.delete( val )
+			#puts "VAL REMOVED #{ val }"
 		end
 	end
 	

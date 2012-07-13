@@ -104,6 +104,99 @@ class Puzzle
 		checkBlockComplete()
 		checkRowComplete()
 		checkColComplete()
+		compareRowPossibles()
+		compareColPossibles()
+	end
+	
+	def compareRowPossibles()
+		possiblesArray = Array.new(@dimension) { Array.new(@dimension) }
+		@dimension.times { |i|
+			@dimension.times { |j|
+				possiblesArray[i][j] = @grid[i][j].possibles				
+			}
+			uniquePossibles = possiblesArray[i].uniq
+			matchArray = Array.new( uniquePossibles.size )
+			if uniquePossibles.size >= 2
+				for m in 0..(uniquePossibles.size - 1)
+					#puts "M = #{ m }"
+					for n in 0..(possiblesArray[i].size - 1)
+						if uniquePossibles[m] == possiblesArray[i][n]
+							if matchArray[m].nil?
+								matchArray[m] = [n]
+							else
+								matchArray[m] << n
+							end
+						end
+					end
+					if ( ! matchArray[m].nil? ) && ( ! uniquePossibles[m].nil? ) && ( matchArray[m].size == uniquePossibles[m].size )
+						#puts "ROW #{ i + 1 }"
+						#puts "POSSIBLES #{ uniquePossibles[m] } size #{ uniquePossibles[m].size }"
+						#puts "COL MATCHES #{ matchArray[m] } size #{ matchArray[m].size }"
+						#puts "M = #{ m }"
+						@dimension.times { |y|
+							if ! matchArray[m].include?( y )
+								for z in 0..(uniquePossibles[m].size - 1)
+								#@uniquePossibles[m].size.times { |z|
+									if ! @grid[ i ][ y ].solved?
+										#puts "ROW #{ i + 1 } COL #{ y + 1 }"
+										#puts "VALUE REMOVED #{ uniquePossibles[m][z] }"
+										@grid[ i ][ y ].removeFromPossibles!( uniquePossibles[m][z] )
+									end
+								#}
+								end
+							end
+						}
+					end
+				end
+				
+			end
+		}
+	end
+	
+	def compareColPossibles()
+		possiblesArray = Array.new(@dimension) { Array.new(@dimension) }
+		@dimension.times { |j|
+			@dimension.times { |i|
+				possiblesArray[i][j] = @grid[i][j].possibles				
+			}
+			uniquePossibles = possiblesArray[j].uniq
+			#fix below
+			matchArray = Array.new( uniquePossibles.size )
+			if uniquePossibles.size >= 2
+				for m in 0..(uniquePossibles.size - 1)
+					#puts "M = #{ m }"
+					for n in 0..(possiblesArray[j].size - 1)
+						if uniquePossibles[m] == possiblesArray[j][n]
+							if matchArray[m].nil?
+								matchArray[m] = [n]
+							else
+								matchArray[m] << n
+							end
+						end
+					end
+					if ( ! matchArray[m].nil? ) && ( ! uniquePossibles[m].nil? ) && ( matchArray[m].size == uniquePossibles[m].size )
+						#puts "COL #{ j + 1 }"
+						#puts "POSSIBLES #{ uniquePossibles[m] } size #{ uniquePossibles[m].size }"
+						#puts "ROW MATCHES #{ matchArray[m] } size #{ matchArray[m].size }"
+						#puts "M = #{ m }"
+						@dimension.times { |x|
+							if ! matchArray[m].include?( x )
+								for z in 0..(uniquePossibles[m].size - 1)
+								#@uniquePossibles[m].size.times { |z|
+									if ! @grid[ x ][ j ].solved?
+										#puts "ROW #{ x + 1 } COL #{ j + 1 }"
+										#puts "VALUE REMOVED #{ uniquePossibles[m][z] }"
+										@grid[ x ][ j ].removeFromPossibles!( uniquePossibles[m][z] )
+									end
+								#}
+								end
+							end
+						}
+					end
+				end
+				
+			end
+		}
 	end
 	
 	def checkRow!( row, col )
