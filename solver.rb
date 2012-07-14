@@ -7,22 +7,22 @@
 #  To run
 #  ruby -w solver.rb <filename>
 
-require 'puzzle'
+require 'Sudoku'
 
 unless ARGV.length == 1
-	puts "Please provide a filename for a sodoku puzzle."
+	puts "Please provide a filename for a sudoku puzzle."
 	exit
 end
 
-puzzle_file = ARGV[0]
+sudoku_file = ARGV[0]
 
-file = File.open( puzzle_file )
+file = File.open( sudoku_file )
 lines = file.readlines
 lineArray = Array.new( 9 )
 9.times{ |i| 
 	lineArray[i] = eval( lines[i] )
 }
-sudoku = Puzzle.new( :puzzle_grid => lineArray )
+sudoku = Sudoku.new( :sudoku_grid => lineArray )
 
 STDOUT.print "Original\n"
 STDOUT.print "#{sudoku}\n"
