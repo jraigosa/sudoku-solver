@@ -1,15 +1,16 @@
-require "Cell"
+require "Square"
 require "Array"
 
-class Puzzle
+class Sudoku
+
 	def initialize( args )
-		if !args[:puzzle_grid].nil?
+		if !args[:sudoku_grid].nil?
 			#If we wanted to be through, we would do more validation here
-			@dimension = args[:puzzle_grid].length
+			@dimension = args[:sudoku_grid].length
 			@grid = Array.new(@dimension) { Array.new(@dimension) }
-			args[:puzzle_grid].each_with_index { |row, i|
+			args[:sudoku_grid].each_with_index { |row, i|
 				row.each_with_index { |col, j|
-					assignCell( i , j, row[j] )
+					assignSquare( i , j, row[j] )
 				}
 			}
 		else 
@@ -32,29 +33,29 @@ class Puzzle
 		for i in 0..8
 			lineArray[i] = eval( lines[0] )
 		end
-		sudoku = Puzzle.new( 9 )
+		sudoku = Sudoku.new( 9 )
 		for i in 0..8
 			for j in 0..8
-				sudoku.assignCell( i , i , lineArray[i][j] )
+				sudoku.assignSquare( i , i , lineArray[i][j] )
 			end
 		end
 		return sudoku
 	end
 	
-	def assignCells()
+	def assignSquares()
 		for i in 0..(@dimension - 1)
 			for j in 0..(@dimension - 1)
 				puts "Enter sudoku.grid element #{i+1}, #{j+1}"
 				STDOUT.flush
 				val = gets.chomp.to_i
-				cell = Cell.new( val, @dimension )
-				@grid[i][j] = cell
+				square = Square.new( val, @dimension )
+				@grid[i][j] = square
 			end
 		end		
 	end
 	
-	def assignCell( row, col, val )
-		@grid[row][col] = Cell.new( val, @dimension )
+	def assignSquare( row, col, val )
+		@grid[row][col] = Square.new( val, @dimension )
 	end
 	
 	def to_s
@@ -79,7 +80,7 @@ class Puzzle
 
 	def solved?
 		@dimension.times { |row|
-			if @grid[row].any? { |cell| !cell.solved? }
+			if @grid[row].any? { |square| !square.solved? }
 				return false
 			end
 		}
@@ -105,38 +106,38 @@ class Puzzle
 		checkBlockComplete()
 		checkRowComplete()
 		checkColComplete()
-		compareRowPossibles()
-		compareColPossibles()
-		compareBlockPossibles()
+		compareRowCandidates()
+		compareColCandidates()
+		compareBlockCandidates()
 	end
 	
-	def compareRowPossibles()
-		possiblesArray = Array.new(@dimension) { Array.new(@dimension) }
+	def compareRowCandidates()
+		candidatesArray = Array.new(@dimension) { Array.new(@dimension) }
 		@dimension.times { |i|
 			@dimension.times { |j|
-				possiblesArray[i][j] = @grid[i][j].possibles				
+				candidatesArray[i][j] = @grid[i][j].candidates				
 			}
-			uniquePossibles = possiblesArray[i].uniq
-			uniquePossibles.compact! #removes nil elements from array
+			uniqueCandidates = candidatesArray[i].uniq
+			uniqueCandidates.compact! #removes nil elements from array
 			matchArray = Array.new()
-			if uniquePossibles.size >= 2
-				for m in 0..(uniquePossibles.size - 1)
+			if uniqueCandidates.size >= 2
+				for m in 0..(uniqueCandidates.size - 1)
 					#puts "M = #{ m }"
-					#puts "UNIQUE POSSIBLE #{ uniquePossibles[m] }"
-					#puts "possibles array #{ possiblesArray[i].join(',') }"
-					#puts "possibles array #{ possiblesArray.join(',') }"
-					matchArray[m] = possiblesArray[i].value_locations( uniquePossibles[m] )
+					#puts "UNIQUE CANDIDATE #{ uniqueCandidates[m] }"
+					#puts "candidates array #{ candidatesArray[i].join(',') }"
+					#puts "candidates array #{ candidatesArray.join(',') }"
+					matchArray[m] = candidatesArray[i].value_locations( uniqueCandidates[m] )
 					#puts "match array #{ matchArray[m].join(',') }"
 					#puts "match array size #{ matchArray[m].size }"
-					if ( ! matchArray[m].nil? ) && ( ! uniquePossibles[m].nil? ) && ( matchArray[m].size == uniquePossibles[m].size )
+					if ( ! matchArray[m].nil? ) && ( ! uniqueCandidates[m].nil? ) && ( matchArray[m].size == uniqueCandidates[m].size )
 						@dimension.times { |y|
 							if ! matchArray[m].include?( y )
-								uniquePossibles[m].size.times { |z|
+								uniqueCandidates[m].size.times { |z|
 									if ! @grid[ i ][ y ].solved?
-										#puts "COMPARE ROW POSSIBLES"
+										#puts "COMPARE ROW CANDIDATES"
 										#puts "ROW #{ i + 1 } COL #{ y + 1 }"
-										#puts "VALUE REMOVED #{ uniquePossibles[m][z] }"
-										@grid[ i ][ y ].removeFromPossibles!( uniquePossibles[m][z] )
+										#puts "VALUE REMOVED #{ uniqueCandidates[m][z] }"
+										@grid[ i ][ y ].removeFromCandidates!( uniqueCandidates[m][z] )
 									end
 								}
 							end
@@ -148,33 +149,33 @@ class Puzzle
 		}
 	end
 	
-	def compareColPossibles()
-		possiblesArray = Array.new(@dimension) { Array.new(@dimension) }
+	def compareColCandidates()
+		candidatesArray = Array.new(@dimension) { Array.new(@dimension) }
 		@dimension.times { |j|
 			@dimension.times { |i|
-				possiblesArray[i][j] = @grid[i][j].possibles				
+				candidatesArray[i][j] = @grid[i][j].candidates				
 			}
-			uniquePossibles = possiblesArray[j].uniq
-			uniquePossibles.compact! #removes nil elements from array
+			uniqueCandidates = candidatesArray[j].uniq
+			uniqueCandidates.compact! #removes nil elements from array
 			#fix below
 			matchArray = Array.new()
-			if uniquePossibles.size >= 2
-				for m in 0..(uniquePossibles.size - 1)
+			if uniqueCandidates.size >= 2
+				for m in 0..(uniqueCandidates.size - 1)
 					#puts "M = #{ m }"
-					matchArray[m] = possiblesArray[j].value_locations( uniquePossibles[m] )
-					if ( ! matchArray[m].nil? ) && ( ! uniquePossibles[m].nil? ) && ( matchArray[m].size == uniquePossibles[m].size )
+					matchArray[m] = candidatesArray[j].value_locations( uniqueCandidates[m] )
+					if ( ! matchArray[m].nil? ) && ( ! uniqueCandidates[m].nil? ) && ( matchArray[m].size == uniqueCandidates[m].size )
 						#puts "COL #{ j + 1 }"
-						#puts "POSSIBLES #{ uniquePossibles[m] } size #{ uniquePossibles[m].size }"
+						#puts "CANDIDATES #{ uniqueCandidates[m] } size #{ uniqueCandidates[m].size }"
 						#puts "ROW MATCHES #{ matchArray[m] } size #{ matchArray[m].size }"
 						#puts "M = #{ m }"
 						@dimension.times { |x|
 							if ! matchArray[m].include?( x )
-								uniquePossibles[m].size.times { |z|
+								uniqueCandidates[m].size.times { |z|
 									if ! @grid[ x ][ j ].solved?
-										#puts "COMPARE COLUMN POSSIBLES"
+										#puts "COMPARE COLUMN CANDIDATES"
 										#puts "ROW #{ x + 1 } COL #{ j + 1 }"
-										#puts "VALUE REMOVED #{ uniquePossibles[m][z] }"
-										@grid[ x ][ j ].removeFromPossibles!( uniquePossibles[m][z] )
+										#puts "VALUE REMOVED #{ uniqueCandidates[m][z] }"
+										@grid[ x ][ j ].removeFromCandidates!( uniqueCandidates[m][z] )
 									end
 								}
 							end
@@ -186,46 +187,46 @@ class Puzzle
 		}
 	end
 	
-	def compareBlockPossibles()
-		possiblesArray = Array.new(@dimension) { Array.new(@dimension) }
+	def compareBlockCandidates()
+		candidatesArray = Array.new(@dimension) { Array.new(@dimension) }
 		anchorArray = [ [0,0], [0,3], [0,6], [3,0], [3,3], [3,6], [6,0], [6,3], [6,6] ]
 		@dimension.times { |k|
 			blockPosition = 0
 			for i in (anchorArray[k][0])..(anchorArray[k][0]+2)
 				for j in (anchorArray[k][1])..(anchorArray[k][1]+2)
-					possiblesArray[k][ blockPosition ] =  @grid[i][j].possibles
+					candidatesArray[k][ blockPosition ] =  @grid[i][j].candidates
 					#puts "block position #{ blockPosition }"
-					#puts possiblesArray[k][ blockPosition ]
+					#puts candidatesArray[k][ blockPosition ]
 					blockPosition += 1
 				end	
 			end
-			uniquePossibles = possiblesArray[k].uniq
-			uniquePossibles.compact! #removes nil elements from array
+			uniqueCandidates = candidatesArray[k].uniq
+			uniqueCandidates.compact! #removes nil elements from array
 			#puts "BLOCK #{ k+1 }"
-			#puts "POSSIBLES ARRAY"
-			#puts possiblesArray[k]
+			#puts "CANDIDATES ARRAY"
+			#puts candidatesArray[k]
 			#puts "UNIQUE ARRAY"
-			#puts uniquePossibles
-			matchArray = Array.new( uniquePossibles.size )
-			if uniquePossibles.size >= 2
-				for m in 0..(uniquePossibles.size - 1) #m counts thru the unique candidate combinations in the block
-					matchArray[m] = possiblesArray[k].value_locations( uniquePossibles[m] )
-					if ( ! matchArray[m].nil? ) && ( ! uniquePossibles[m].nil? ) && ( uniquePossibles[m].size > 1 ) && ( matchArray[m].size == uniquePossibles[m].size )
+			#puts uniqueCandidates
+			matchArray = Array.new( uniqueCandidates.size )
+			if uniqueCandidates.size >= 2
+				for m in 0..(uniqueCandidates.size - 1) #m counts thru the unique candidate combinations in the block
+					matchArray[m] = candidatesArray[k].value_locations( uniqueCandidates[m] )
+					if ( ! matchArray[m].nil? ) && ( ! uniqueCandidates[m].nil? ) && ( uniqueCandidates[m].size > 1 ) && ( matchArray[m].size == uniqueCandidates[m].size )
 						#puts "BLOCK #{ k + 1 }"
-						#puts "POSSIBLES #{ uniquePossibles[m] } size #{ uniquePossibles[m].size }"
-						#puts "CELL MATCHES #{ matchArray[m] } size #{ matchArray[m].size }"
+						#puts "CANDIDATES #{ uniqueCandidates[m] } size #{ uniqueCandidates[m].size }"
+						#puts "SQUARE MATCHES #{ matchArray[m] } size #{ matchArray[m].size }"
 						#puts "M = #{ m }"
 						blockPosition = 0
 						for i in (anchorArray[k][0])..(anchorArray[k][0]+2)
 							for j in (anchorArray[k][1])..(anchorArray[k][1]+2)
 								if ! matchArray[m].include?( blockPosition )
-									for z in 0..(uniquePossibles[m].size - 1)
-									#@uniquePossibles[m].size.times { |z|
+									for z in 0..(uniqueCandidates[m].size - 1)
+									#@uniqueCandidates[m].size.times { |z|
 										if ! @grid[ i ][ j ].solved?
-											#puts "COMPARE BLOCK POSSIBLES"
+											#puts "COMPARE BLOCK CANDIDATES"
 											#puts "ROW #{ i + 1 } COL #{ j + 1 }"
-											#puts "VALUE REMOVED #{ uniquePossibles[m][z] }"
-											@grid[ i ][ j ].removeFromPossibles!( uniquePossibles[m][z] )
+											#puts "VALUE REMOVED #{ uniqueCandidates[m][z] }"
+											@grid[ i ][ j ].removeFromCandidates!( uniqueCandidates[m][z] )
 										end
 									#}
 									end
@@ -240,38 +241,38 @@ class Puzzle
 	end
 	
 	def checkRow!( row, col )
-		cell_to_check = @grid[row][col]
+		square_to_check = @grid[row][col]
 		
-		#Nothing to do if this cell is already solved
-		if cell_to_check.solved?
+		#Nothing to do if this square is already solved
+		if square_to_check.solved?
 			return
 		end
 
-		@grid[row].find_all{ |cell|
-			cell.solved?
-		}.each{ |cell| 
-			cell_to_check.check!( cell.to_i )
+		@grid[row].find_all{ |square|
+			square.solved?
+		}.each{ |square| 
+			square_to_check.check!( square.to_i )
 
-			if cell_to_check.solved?
+			if square_to_check.solved?
 				return
 			end
 		}
 	end
 	
 	def checkCol!( row, col )
-		cell_to_check = @grid[row][col]
+		square_to_check = @grid[row][col]
 
-		#Nothing to do if this cell is already solved
-		if cell_to_check.solved?
+		#Nothing to do if this square is already solved
+		if square_to_check.solved?
 			return
 		end
 
 		@dimension.times { |i| 
 			if i != row
-				cell_to_check.check!( @grid[i][col].to_i )
+				square_to_check.check!( @grid[i][col].to_i )
 			end
 
-			if cell_to_check.solved?
+			if square_to_check.solved?
 				return
 			end
 		}
@@ -306,11 +307,11 @@ class Puzzle
 			for val in 0..(@dimension - 1 )
 				for j in 0..(@dimension - 1 )
 					if rowArray[i][val].nil?
-						if @grid[i][j].possibleValue?( val + 1 )
+						if @grid[i][j].candidateValue?( val + 1 )
 							rowArray[i][val] = [j]
 						end
 					else
-						if @grid[i][j].possibleValue?( val + 1 )
+						if @grid[i][j].candidateValue?( val + 1 )
 							rowArray[i][val] = rowArray[i][val] + [j]
 						end
 					end
@@ -335,11 +336,11 @@ class Puzzle
 			for val in 0..(@dimension - 1 )
 				for i in 0..(@dimension - 1 )
 					if colArray[j][val].nil?
-						if @grid[i][j].possibleValue?( val + 1 )
+						if @grid[i][j].candidateValue?( val + 1 )
 							colArray[j][val] = [i]
 						end
 					else
-						if @grid[i][j].possibleValue?( val + 1 )
+						if @grid[i][j].candidateValue?( val + 1 )
 							colArray[j][val] = colArray[j][val] + [i]
 						end
 					end
@@ -369,13 +370,13 @@ class Puzzle
 					
 						if coordinateArray[k][val].nil?
 							#if ! @grid[i][j].solved?
-								if @grid[i][j].possibleValue?( val + 1 )
+								if @grid[i][j].candidateValue?( val + 1 )
 									coordinateArray[k][val] = [ i , j ]
 								end
 							#end
 						else
 							#if ! @grid[i][j].solved?
-								if @grid[i][j].possibleValue?( val + 1 )
+								if @grid[i][j].candidateValue?( val + 1 )
 									coordinateArray[k][val] = coordinateArray[k][val] + [ i , j ]
 								end
 							#end
@@ -389,50 +390,50 @@ class Puzzle
 						col = coordinateArray[k][val][1]
 						if ! @grid[ row ][ col ].solved?
 							#puts "BLOCK COMPLETE CHECK: BLOCK: #{ k + 1 }"
-							#puts "ASSIGNED CELL. ROW: #{ row + 1 } COL: #{ col + 1 }"
+							#puts "ASSIGNED SQUARE. ROW: #{ row + 1 } COL: #{ col + 1 }"
 							#puts "VALUE: #{ val + 1 }"
 							@grid[row][col].solve!(val + 1 )
 						end
 					elsif coordinateArray[k][val].size == 4
 						if coordinateArray[k][val][0] == coordinateArray[k][val][2]
-							#puts "Cells collinear along a row.  VAL: #{ val + 1 }"
-							#puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
-							#puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
+							#puts "Squares collinear along a row.  VAL: #{ val + 1 }"
+							#puts "Square 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
+							#puts "Square 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
 							for y in 0..(@dimension-1)
 								if ( (y != coordinateArray[k][val][1] ) && ( y != coordinateArray[k][val][3] ) )
-									@grid[ coordinateArray[k][val][0] ][ y ].removeFromPossibles!( val + 1 )
+									@grid[ coordinateArray[k][val][0] ][ y ].removeFromCandidates!( val + 1 )
 								end
 							end
 						elsif coordinateArray[k][val][1] == coordinateArray[k][val][3]
-							#puts "Cells collinear along a column. VAL: #{ val + 1 }"
-							#puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
-							#puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
+							#puts "Squares collinear along a column. VAL: #{ val + 1 }"
+							#puts "Square 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
+							#puts "Square 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
 							for x in 0..(@dimension-1)
 								if ( (x != coordinateArray[k][val][0] ) && ( x != coordinateArray[k][val][2] ) )
-									@grid[ x ][ coordinateArray[k][val][1] ].removeFromPossibles!( val + 1 )
+									@grid[ x ][ coordinateArray[k][val][1] ].removeFromCandidates!( val + 1 )
 								end
 							end
 						end
 
 					elsif coordinateArray[k][val].size == 6
 						if ( ( coordinateArray[k][val][0] == coordinateArray[k][val][2] ) && ( coordinateArray[k][val][0] == coordinateArray[k][val][4] ) )
-							#puts "Cells collinear along a row. VAL: #{ val + 1 }"
-							#puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
-							#puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
-							#puts "Cell 2:  ROW: #{ coordinateArray[k][val][4] + 1 } COL:  #{ coordinateArray[k][val][5] + 1 }"
+							#puts "Squares collinear along a row. VAL: #{ val + 1 }"
+							#puts "Square 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
+							#puts "Square 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
+							#puts "Square 2:  ROW: #{ coordinateArray[k][val][4] + 1 } COL:  #{ coordinateArray[k][val][5] + 1 }"
 							for y in 0..(@dimension-1)
 								if ( (y != coordinateArray[k][val][1] ) && ( y != coordinateArray[k][val][3] ) && ( y != coordinateArray[k][val][5] ) )
-									@grid[ coordinateArray[k][val][0] ][ y ].removeFromPossibles!( val + 1 )
+									@grid[ coordinateArray[k][val][0] ][ y ].removeFromCandidates!( val + 1 )
 								end
 							end
 						elsif ( ( coordinateArray[k][val][1] == coordinateArray[k][val][3] ) && ( coordinateArray[k][val][1] == coordinateArray[k][val][5] ) )
-							#puts "Cells collinear along a column. VAL: #{ val + 1 }"
-							#puts "Cell 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
-							#puts "Cell 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
-							#puts "Cell 2:  ROW: #{ coordinateArray[k][val][4] + 1 } COL:  #{ coordinateArray[k][val][5] + 1 }"
+							#puts "Squares collinear along a column. VAL: #{ val + 1 }"
+							#puts "Square 1:  ROW: #{ coordinateArray[k][val][0] + 1 } COL:  #{ coordinateArray[k][val][1] + 1 }"
+							#puts "Square 2:  ROW: #{ coordinateArray[k][val][2] + 1 } COL:  #{ coordinateArray[k][val][3] + 1 }"
+							#puts "Square 2:  ROW: #{ coordinateArray[k][val][4] + 1 } COL:  #{ coordinateArray[k][val][5] + 1 }"
 							for x in 0..(@dimension-1)
 								if ( (x != coordinateArray[k][val][0] ) && ( x != coordinateArray[k][val][2] ) && ( x != coordinateArray[k][val][4] ) )
-									@grid[ x ][ coordinateArray[k][val][1] ].removeFromPossibles!( val + 1 )
+									@grid[ x ][ coordinateArray[k][val][1] ].removeFromCandidates!( val + 1 )
 								end
 							end
 						end	
@@ -441,10 +442,11 @@ class Puzzle
 			end
 		end
 	end
-		
-	def showPossibles( row, col )
-		possibles = @grid[row][col].possibles
-		puts possibles
+	
+	# Probably obsolete.  Takes a row and column that references a particular square/square and returns the candidates		
+	def showCandidates( row, col )
+		candidates = @grid[row][col].candidates
+		puts candidates
 	end
 		
 end

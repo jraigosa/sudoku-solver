@@ -8,22 +8,22 @@
 #  To run
 #  ruby -w grid_test.rb
 
-require "Puzzle"
+require "Sudoku"
 
 continue = 1
 while ! continue.zero?
 
 =begin
-	puts "Enter dimension for puzzle"
+	puts "Enter dimension for sudoku"
 	STDOUT.flush
 	dimension = gets.chomp.to_i
-	sudoku = Puzzle.new( dimension )
+	sudoku = Sudoku.new( dimension )
 
-    puts "Do you want to assign the cell values?"
+    puts "Do you want to assign the square values?"
 	STDOUT.flush
 	yes = gets.chomp.to_i
 	if ! yes.zero?
-		sudoku.assignCells()
+		sudoku.assignSquares()
 	end
 =end
 	
@@ -37,14 +37,14 @@ while ! continue.zero?
 	for i in 0..8
 		lineArray[i] = eval( lines[i] )
 	end
-	sudoku = Puzzle.new( :dimension => 9 )
+	sudoku = Sudoku.new( :dimension => 9 )
 	for i in 0..8
 		for j in 0..8
-			sudoku.assignCell( i , j, lineArray[i][j] )
+			sudoku.assignSquare( i , j, lineArray[i][j] )
 		end
 	end
 	
-	STDOUT.puts "1 to display puzzle, 0 to continue"
+	STDOUT.puts "1 to display sudoku, 0 to continue"
 	STDOUT.flush
 	yes = STDIN.gets.chomp.to_i
 	if ! yes.zero?
@@ -59,18 +59,18 @@ while ! continue.zero?
 		end
 
 =begin
-		possibles = 1
-		while ! possibles.zero?
+		candidates = 1
+		while ! candidates.zero?
 			puts "Enter row:"
 			STDOUT.flush
 			row = gets.chomp.to_i - 1
 			puts "Enter col:"
 			STDOUT.flush
 			col = gets.chomp.to_i - 1
-			sudoku.showPossibles( row, col )
+			sudoku.showCandidates( row, col )
 			puts "0 to stop.  1 to continue."
 			STDOUT.flush
-			possibles = gets.chomp.to_i
+			candidates = gets.chomp.to_i
 		end
 =end
 
