@@ -106,6 +106,7 @@ class Puzzle
 		checkColComplete()
 		compareRowPossibles()
 		compareColPossibles()
+		compareBlockPossibles()
 	end
 	
 	def compareRowPossibles()
@@ -115,6 +116,11 @@ class Puzzle
 				possiblesArray[i][j] = @grid[i][j].possibles				
 			}
 			uniquePossibles = possiblesArray[i].uniq
+			#puts "ROW #{ i+1 }"
+			#puts "POSSIBLES ARRAY"
+			#puts possiblesArray[i]
+			#puts "UNIQUE ARRAY"
+			#puts uniquePossibles
 			matchArray = Array.new( uniquePossibles.size )
 			if uniquePossibles.size >= 2
 				for m in 0..(uniquePossibles.size - 1)
@@ -138,6 +144,7 @@ class Puzzle
 								for z in 0..(uniquePossibles[m].size - 1)
 								#@uniquePossibles[m].size.times { |z|
 									if ! @grid[ i ][ y ].solved?
+										#puts "COMPARE ROW POSSIBLES"
 										#puts "ROW #{ i + 1 } COL #{ y + 1 }"
 										#puts "VALUE REMOVED #{ uniquePossibles[m][z] }"
 										@grid[ i ][ y ].removeFromPossibles!( uniquePossibles[m][z] )
@@ -184,6 +191,7 @@ class Puzzle
 								for z in 0..(uniquePossibles[m].size - 1)
 								#@uniquePossibles[m].size.times { |z|
 									if ! @grid[ x ][ j ].solved?
+										#puts "COMPARE COLUMN POSSIBLES"
 										#puts "ROW #{ x + 1 } COL #{ j + 1 }"
 										#puts "VALUE REMOVED #{ uniquePossibles[m][z] }"
 										@grid[ x ][ j ].removeFromPossibles!( uniquePossibles[m][z] )
@@ -195,6 +203,66 @@ class Puzzle
 					end
 				end
 				
+			end
+		}
+	end
+	
+	def compareBlockPossibles()
+		possiblesArray = Array.new(@dimension) { Array.new(@dimension) }
+		anchorArray = [ [0,0], [0,3], [0,6], [3,0], [3,3], [3,6], [6,0], [6,3], [6,6] ]
+		@dimension.times { |k|
+			blockPosition = 0
+			for i in (anchorArray[k][0])..(anchorArray[k][0]+2)
+				for j in (anchorArray[k][1])..(anchorArray[k][1]+2)
+					possiblesArray[k][ blockPosition ] =  @grid[i][j].possibles
+					#puts "block position #{ blockPosition }"
+					#puts possiblesArray[k][ blockPosition ]
+					blockPosition += 1
+				end	
+			end
+			uniquePossibles = possiblesArray[k].uniq
+			#puts "BLOCK #{ k+1 }"
+			#puts "POSSIBLES ARRAY"
+			#puts possiblesArray[k]
+			#puts "UNIQUE ARRAY"
+			#puts uniquePossibles
+			matchArray = Array.new( uniquePossibles.size )
+			if uniquePossibles.size >= 2
+				for m in 0..(uniquePossibles.size - 1) #m counts thru the unique candidate combinations in the block
+					for n in 0..( possiblesArray[k].size - 1 ) #n counts thru the candidate combinations for each cell in the block
+						if uniquePossibles[m] == possiblesArray[k][n]
+							if matchArray[m].nil?
+								matchArray[m] = [n]
+							else
+								matchArray[m] << n
+							end
+						end
+					end
+					if ( ! matchArray[m].nil? ) && ( ! uniquePossibles[m].nil? ) && ( uniquePossibles[m].size > 1 ) && ( matchArray[m].size == uniquePossibles[m].size )
+						puts "BLOCK #{ k + 1 }"
+						puts "POSSIBLES #{ uniquePossibles[m] } size #{ uniquePossibles[m].size }"
+						puts "CELL MATCHES #{ matchArray[m] } size #{ matchArray[m].size }"
+						#puts "M = #{ m }"
+						blockPosition = 0
+						for i in (anchorArray[k][0])..(anchorArray[k][0]+2)
+							for j in (anchorArray[k][1])..(anchorArray[k][1]+2)
+								if ! matchArray[m].include?( blockPosition )
+									for z in 0..(uniquePossibles[m].size - 1)
+									#@uniquePossibles[m].size.times { |z|
+										if ! @grid[ i ][ j ].solved?
+											puts "COMPARE BLOCK POSSIBLES"
+											puts "ROW #{ i + 1 } COL #{ j + 1 }"
+											puts "VALUE REMOVED #{ uniquePossibles[m][z] }"
+											@grid[ i ][ j ].removeFromPossibles!( uniquePossibles[m][z] )
+										end
+									#}
+									end
+								end
+								blockPosition += 1
+							end	
+						end
+					end
+				end
 			end
 		}
 	end
@@ -287,8 +355,7 @@ class Puzzle
 				end
 			end
 		end		
-	end
-	
+	end	
 	
 	def checkColComplete()
 		colArray = Array.new(@dimension) { Array.new(@dimension) }
@@ -402,8 +469,7 @@ class Puzzle
 			end
 		end
 	end
-	
-	
+		
 	def showPossibles( row, col )
 		possibles = @grid[row][col].possibles
 		puts possibles
