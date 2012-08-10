@@ -16,7 +16,7 @@ class Square
 			"·" :
 			@val.to_s
 	end
-	
+
 	def solved?
 		return !@val.zero?
 	end
