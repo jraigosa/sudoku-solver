@@ -5,7 +5,7 @@ class Sudoku
 
 	def initialize( args )
 		if !args[:sudoku_grid].nil?
-			#If we wanted to be through, we would do more validation here
+			#If we wanted to be thorough, we would do more validation here
 			@dimension = args[:sudoku_grid].length
 			@grid = Array.new(@dimension) { Array.new(@dimension) }
 			@solvedSquares = 0
